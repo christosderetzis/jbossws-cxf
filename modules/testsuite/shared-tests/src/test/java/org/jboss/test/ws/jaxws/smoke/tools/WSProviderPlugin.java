@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -61,7 +62,11 @@ public class WSProviderPlugin extends JBossWSTest
       if(toogleMessageOut) provider.setMessageStream(System.out);
 
       // shared output directory, relative to test execution
-      outputDirectory = createResourceFile(".." + FS + "wsprovide" + FS + "java");      
+      try {
+         outputDirectory = createResourceFile(".." + FS + "wsprovide" + FS + "output").getCanonicalFile();
+      } catch (IOException e) {
+         outputDirectory = new File(".." + FS + "wsprovide" + FS + "output").getAbsoluteFile();
+      }
    }
 
    private ClassLoader getArtefactClassLoader() throws Exception {
@@ -263,9 +268,9 @@ public class WSProviderPlugin extends JBossWSTest
           loader = new URLClassLoader(
              new URL[]
              {
-                new URL("file:"+targetDir+FS+"test-libs" + FS + "jaxws-classloading-service.jar"),
-                new URL("file:"+targetDir+FS+"test-libs" + FS + "jaxws-classloading-types.jar"),
-                new URL("file:"+jdkHome+FS+"lib" + FS + "tools.jar")
+                new File(targetDir, "test-libs" + FS + "jaxws-classloading-service.jar").toURI().toURL(),
+                new File(targetDir, "test-libs" + FS + "jaxws-classloading-types.jar").toURI().toURL(),
+                new File(jdkHome, "lib" + FS + "tools.jar").toURI().toURL()
              },
             getArtefactClassLoader()
           );
@@ -274,8 +279,8 @@ public class WSProviderPlugin extends JBossWSTest
           loader = new URLClassLoader(
              new URL[]
              {
-                new URL("file:"+targetDir+FS+"test-libs" + FS + "jaxws-classloading-service.jar"),
-                new URL("file:"+targetDir+FS+"test-libs" + FS + "jaxws-classloading-types.jar"),
+                new File(targetDir, "test-libs" + FS + "jaxws-classloading-service.jar").toURI().toURL(),
+                new File(targetDir, "test-libs" + FS + "jaxws-classloading-types.jar").toURI().toURL()
              },
             getArtefactClassLoader()
           );
